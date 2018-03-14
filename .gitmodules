@@ -1,0 +1,9 @@
+[submodule "vendor/golang.org/x/net"]
+	path = vendor/golang.org/x/net
+	url = git://github.com/golang/net.git
+[submodule "vendor/google.golang.org/grpc"]
+	path = vendor/google.golang.org/grpc
+	url = git://github.com/grpc/grpc-go.git
+[submodule "vendor/gogo/protobuf"]
+	path = vendor/gogo/protobuf
+	url = git://github.com/gogo/protobuf.git
