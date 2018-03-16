@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	"github.com/enj/kms/api/v1beta1"
+	"github.com/enj/kms/pkg/encryption"
 
 	"golang.org/x/net/context"
 )
 
 const (
 	version        = "v1beta1"
-	runtimeName    = "clevis_kms"
+	runtimeName    = "kms_cmd"
 	runtimeVersion = "0.0.1"
 )
 
@@ -20,38 +21,48 @@ var apiVersionResponse = &v1beta1.VersionResponse{
 	RuntimeVersion: runtimeVersion,
 }
 
-func NewClevisKMS() (v1beta1.KeyManagementServiceServer, error) {
-	return &clevisKMS{}, nil
+func NewKeyManagementService(service encryption.EncryptionService) (v1beta1.KeyManagementServiceServer, error) {
+	return &kms{service: service}, nil
 }
 
-var _ v1beta1.KeyManagementServiceServer = &clevisKMS{}
+var _ v1beta1.KeyManagementServiceServer = &kms{}
 
-type clevisKMS struct{} // TODO this may need to be public
+type kms struct {
+	service encryption.EncryptionService
+}
 
 // TODO see if need to use context anywhere
 
-func (c *clevisKMS) Version(ctx context.Context, req *v1beta1.VersionRequest) (*v1beta1.VersionResponse, error) {
+func (k *kms) Version(ctx context.Context, req *v1beta1.VersionRequest) (*v1beta1.VersionResponse, error) {
 	if err := checkVersion(req.Version); err != nil {
 		return nil, err
 	}
 	return apiVersionResponse, nil
 }
 
-func (c *clevisKMS) Decrypt(ctx context.Context, req *v1beta1.DecryptRequest) (*v1beta1.DecryptResponse, error) {
+func (k *kms) Decrypt(ctx context.Context, req *v1beta1.DecryptRequest) (*v1beta1.DecryptResponse, error) {
 	if err := checkVersion(req.Version); err != nil {
+		return nil, err
+	}
+	plain, err := k.service.Decrypt(req.Cipher)
+	if err != nil {
 		return nil, err
 	}
 	return &v1beta1.DecryptResponse{
-		Plain: req.Cipher, // TODO actually do decryption
+		Plain: plain,
 	}, nil
 }
 
-func (c *clevisKMS) Encrypt(ctx context.Context, req *v1beta1.EncryptRequest) (*v1beta1.EncryptResponse, error) {
+func (k *kms) Encrypt(ctx context.Context, req *v1beta1.EncryptRequest) (*v1beta1.EncryptResponse, error) {
 	if err := checkVersion(req.Version); err != nil {
 		return nil, err
 	}
+	cipher, err := k.service.Encrypt(req.Plain)
+	if err != nil {
+		return nil, err
+	}
 	return &v1beta1.EncryptResponse{
-		Cipher: req.Plain, // TODO actually do encryption
+		Cipher: cipher,
 	}, nil
 }
 

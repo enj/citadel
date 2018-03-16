@@ -7,6 +7,8 @@ import (
 	"net/url"
 
 	"github.com/enj/kms/api/v1beta1"
+	"github.com/enj/kms/pkg/encryption"
+	"github.com/enj/kms/pkg/kek"
 	"github.com/enj/kms/pkg/kms"
 
 	"google.golang.org/grpc"
@@ -19,6 +21,7 @@ const (
 
 var (
 	endpointFlag = flag.String("endpoint", "", `the address to listen on, for example "unix:///var/run/kms-provider.sock"`)
+	commandFlag  = flag.String("command", "", "the command to retrieve the key encryption key")
 )
 
 func Execute() error {
@@ -33,14 +36,22 @@ func Execute() error {
 		return err
 	}
 
-	clevisKMS, err := kms.NewClevisKMS()
+	cmdKEK, err := kek.NewCommandKEKService(*commandFlag) // TODO validate and move out
+	if err != nil {
+		return err
+	}
+	aesService, err := encryption.NewAESCBCService(cmdKEK)
+	if err != nil {
+		return err
+	}
+	kmService, err := kms.NewKeyManagementService(aesService)
 	if err != nil {
 		return err
 	}
 
 	var opts []grpc.ServerOption // TODO see if we need any options
 	grpcServer := grpc.NewServer(opts...)
-	v1beta1.RegisterKeyManagementServiceServer(grpcServer, clevisKMS)
+	v1beta1.RegisterKeyManagementServiceServer(grpcServer, kmService)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		return err
