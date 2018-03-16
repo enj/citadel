@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"time"
 
 	"github.com/enj/kms/api/v1beta1"
 	"github.com/enj/kms/pkg/encryption"
@@ -36,10 +37,11 @@ func Execute() error {
 		return err
 	}
 
-	cmdKEK, err := kek.NewCommandKEKService(*commandFlag) // TODO validate and move out
+	cmdKEK, err := kek.NewCommandKEKService(*commandFlag, 5*time.Minute) // TODO validate and move out
 	if err != nil {
 		return err
 	}
+	defer cmdKEK.Stop()
 	aesService, err := encryption.NewAESCBCService(cmdKEK)
 	if err != nil {
 		return err

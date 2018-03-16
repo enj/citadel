@@ -17,7 +17,11 @@ type EncryptionService interface {
 }
 
 func NewAESCBCService(kek kek.KeyEncryptionKeyService) (EncryptionService, error) {
-	return &cbc{kek: kek}, nil
+	c := &cbc{kek: kek}
+	if _, err := c.getBlock(); err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 var (
