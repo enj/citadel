@@ -12,7 +12,7 @@ import (
 const (
 	version        = "v1beta1"
 	runtimeName    = "kms_cmd"
-	runtimeVersion = "0.0.1"
+	runtimeVersion = "0.0.1" // TODO embed git sha on build
 )
 
 var apiVersionResponse = &v1beta1.VersionResponse{
@@ -21,8 +21,8 @@ var apiVersionResponse = &v1beta1.VersionResponse{
 	RuntimeVersion: runtimeVersion,
 }
 
-func NewKeyManagementService(service encryption.EncryptionService) (v1beta1.KeyManagementServiceServer, error) {
-	return &kms{service: service}, nil
+func NewKeyManagementService(service encryption.EncryptionService) v1beta1.KeyManagementServiceServer {
+	return &kms{service: service}
 }
 
 var _ v1beta1.KeyManagementServiceServer = &kms{}

@@ -46,10 +46,7 @@ func Execute() error {
 	if err != nil {
 		return err
 	}
-	kmService, err := kms.NewKeyManagementService(aesService)
-	if err != nil {
-		return err
-	}
+	kmService := kms.NewKeyManagementService(aesService)
 
 	var opts []grpc.ServerOption // TODO see if we need any options
 	grpcServer := grpc.NewServer(opts...)
