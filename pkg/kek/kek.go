@@ -31,7 +31,7 @@ type cmdKEK struct {
 	cmd      string
 	duration time.Duration
 
-	kek      []byte
+	kek      []byte // TODO consider using https://github.com/awnumar/memguard for this
 	fetchErr error
 }
 
@@ -47,6 +47,7 @@ func (c *cmdKEK) Get() ([]byte, error) {
 }
 
 func (c *cmdKEK) Stop() {
+	c.setErrorState(errEmptyKey)
 	close(c.stop)
 }
 
@@ -60,6 +61,7 @@ func (c *cmdKEK) setValidSate(kek []byte) {
 func (c *cmdKEK) setErrorState(err error) {
 	c.mutex.Lock()
 	c.fetchErr = err
+	wipeBytes(c.kek)
 	c.kek = nil
 	c.mutex.Unlock()
 }
@@ -111,4 +113,13 @@ func (c *cmdKEK) prime() error {
 	}
 	c.kek = kek
 	return nil
+}
+
+// Wipes a byte slice with zeroes.
+func wipeBytes(buf []byte) {
+	// Iterate over the slice...
+	for i := 0; i < len(buf); i++ {
+		// ... setting each element to zero.
+		buf[i] = byte(0)
+	}
 }
