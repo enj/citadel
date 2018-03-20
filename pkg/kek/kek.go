@@ -47,7 +47,6 @@ func (c *cmdKEK) Get() ([]byte, error) {
 }
 
 func (c *cmdKEK) Stop() {
-	c.setErrorState(errEmptyKey)
 	close(c.stop)
 }
 
@@ -81,6 +80,7 @@ func (c *cmdKEK) run() {
 	const factor = 5 // TODO move constant, maybe make configurable?
 	ticker := time.NewTicker(c.duration / factor)
 	defer ticker.Stop()
+	defer c.setErrorState(errEmptyKey)
 
 	current := 0
 
