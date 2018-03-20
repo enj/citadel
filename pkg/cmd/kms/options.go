@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/url"
 	"time"
+	"os"
 )
 
 const (
@@ -13,6 +14,8 @@ const (
 	unixProtocol = "unix"
 
 	minTimeout = time.Minute
+
+	fdStart = 3
 )
 
 type arguments struct {
@@ -58,24 +61,37 @@ func getOptions() (*options, error) {
 }
 
 func getListener(endpoint string) (net.Listener, error) {
+	if len(args.endpoint) == 0 {
+		return getSocketActivationListener()
+	}
+
 	endpoint, err := parseEndpoint(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	listener, err := net.Listen(unixProtocol, endpoint)
-	if err != nil {
-		return nil, err
+	return net.Listen(unixProtocol, endpoint)
+}
+
+func getSocketActivationListener() (net.Listener, error) {
+	nsockets, ok := os.LookupEnv("LISTEN_FDS")
+	if !ok {
+		return nil, fmt.Errorf("not running in a socket activation environment")
 	}
 
-	return listener, nil
+	if nsockets != "1" {
+		return nil, fmt.Errorf("multiple sockets are not supported")
+	}
+
+	file := os.NewFile(fdStart, "socket")
+	if file == nil {
+		return nil, fmt.Errorf("unable to create file from descriptor")
+	}
+
+	return net.FileListener(file)
 }
 
 func parseEndpoint(endpoint string) (string, error) {
-	if len(endpoint) == 0 {
-		return "", fmt.Errorf("endpoint is required")
-	}
-
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return "", fmt.Errorf("invalid endpoint %q: %v", endpoint, err)
