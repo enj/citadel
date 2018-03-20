@@ -33,9 +33,9 @@ type options struct {
 var args = &arguments{}
 
 func init() {
-	flag.StringVar(&args.endpoint, "endpoint", "", `the address to listen on, for example "unix:///var/run/kms-provider.sock"`)
+	flag.StringVar(&args.endpoint, "endpoint", "", `the listen address (ex. unix:///tmp/kms.sock)`)
 	flag.StringVar(&args.command, "command", "", "the command to retrieve the key encryption key")
-	flag.DurationVar(&args.timeout, "timeout", time.Hour, "maximum time in between failed calls to command before local key encryption key is zerod")
+	flag.DurationVar(&args.timeout, "timeout", time.Hour, "maximum time to cache KEK locally")
 	flag.Parse()
 }
 
