@@ -2,7 +2,7 @@ package kms
 
 import (
 	"github.com/enj/kms/api/v1beta1"
-	"github.com/enj/kms/pkg/encryption"
+	"github.com/enj/kms/pkg/encryption/aes"
 	"github.com/enj/kms/pkg/kek"
 	"github.com/enj/kms/pkg/kms"
 
@@ -21,7 +21,7 @@ func Execute() error {
 	}
 	defer cmdKEK.Stop()
 
-	aesService, err := encryption.NewAESCBCService(cmdKEK)
+	aesService, err := aes.NewAESCBCService(cmdKEK)
 	if err != nil {
 		return err
 	}
