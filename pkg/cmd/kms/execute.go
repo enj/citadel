@@ -2,7 +2,7 @@ package kms
 
 import (
 	"github.com/enj/kms/api/v1beta1"
-	"github.com/enj/kms/pkg/encryption/aes"
+	"github.com/enj/kms/pkg/encryption/prefix"
 	"github.com/enj/kms/pkg/kek"
 	"github.com/enj/kms/pkg/kms"
 
@@ -21,12 +21,13 @@ func Execute() error {
 	}
 	defer cmdKEK.Stop()
 
-	aesService, err := aes.NewAESCBCService(cmdKEK)
+	encryptionService, err := opts.mode.Handler(cmdKEK)
 	if err != nil {
 		return err
 	}
+	encryptionService = prefix.NewPrefixEncryption(opts.mode, encryptionService)
 
-	kmService := kms.NewKeyManagementService(aesService)
+	kmService := kms.NewKeyManagementService(encryptionService)
 
 	var serverOptions []grpc.ServerOption // TODO see if we need any server options
 	grpcServer := grpc.NewServer(serverOptions...)

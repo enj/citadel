@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"net"
 	"net/url"
-	"time"
 	"os"
+	"time"
+
+	"github.com/enj/kms/pkg/encryption"
+	"github.com/enj/kms/pkg/encryption/aes"
 )
 
 const (
@@ -22,19 +25,32 @@ type arguments struct {
 	endpoint string
 	command  string
 	timeout  time.Duration
+	mode     string
 }
 
 type options struct {
 	listener net.Listener
 	command  string
 	timeout  time.Duration
+	mode     encryption.EncryptionMode
 }
 
-var args = &arguments{}
+var (
+	args = &arguments{}
+
+	encryptionModes = []encryption.EncryptionMode{
+		{
+			Name:    "aescbc",
+			Version: "v1",
+			Handler: aes.NewAESCBCService,
+		},
+	}
+)
 
 func init() {
 	flag.StringVar(&args.endpoint, "endpoint", "", `the listen address (ex. unix:///tmp/kms.sock)`)
 	flag.StringVar(&args.command, "command", "", "the command to retrieve the key encryption key")
+	flag.StringVar(&args.mode, "mode", encryptionModes[0].Name, fmt.Sprintf("encryption mode to use, the options are %s", encryptionModes))
 	flag.DurationVar(&args.timeout, "timeout", time.Hour, "maximum time to cache KEK locally")
 	flag.Parse()
 }
@@ -53,10 +69,16 @@ func getOptions() (*options, error) {
 		return nil, fmt.Errorf("the minimum supported timeout is %s", minTimeout)
 	}
 
+	mode, err := getMode(args.mode)
+	if err != nil {
+		return nil, err
+	}
+
 	return &options{
 		listener: listener,
 		command:  args.command,
 		timeout:  args.timeout,
+		mode:     mode,
 	}, nil
 }
 
@@ -106,4 +128,13 @@ func parseEndpoint(endpoint string) (string, error) {
 	}
 
 	return u.Path, nil
+}
+
+func getMode(mode string) (encryption.EncryptionMode, error) {
+	for _, encryptionMode := range encryptionModes {
+		if encryptionMode.Name == mode {
+			return encryptionMode, nil
+		}
+	}
+	return encryption.EncryptionMode{}, fmt.Errorf("invalid mode %q, use one of %s", mode, encryptionModes)
 }
