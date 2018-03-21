@@ -25,13 +25,15 @@ socket activation is assumed.
 
 ### Required
 
- * `-command string`: the command to retrieve the key encryption key
+ * `--command string`: the command to retrieve the key encryption key
 
 ### Optional
 
- * `-endpoint string`: the listen address (ex. unix:///tmp/kms.sock)
+ * `--endpoint string`: the listen address (ex. `unix:///tmp/kms.sock`)
 
- * `-timeout duration`: maximum time to cache KEK locally (default 1h0m0s)
+ * `--timeout duration`: maximum time to cache KEK locally (default 1h)
+
+ * `--mode string`: encryption mode to use, the options are \[aescbc\] (default "aescbc")
 
 ## Crypto Details
 
