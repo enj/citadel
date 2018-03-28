@@ -4,21 +4,18 @@ import (
 	"fmt"
 
 	"github.com/enj/citadel/api/v1beta1"
+	"github.com/enj/citadel/pkg/api"
 	"github.com/enj/citadel/pkg/encryption"
 
 	"golang.org/x/net/context"
 )
 
-const (
-	version        = "v1beta1"
-	runtimeName    = "kms_cmd"
-	runtimeVersion = "0.0.1" // TODO embed git sha on build
-)
+const kmsAPIVersion = "v1beta1"
 
 var apiVersionResponse = &v1beta1.VersionResponse{
-	Version:        version,
-	RuntimeName:    runtimeName,
-	RuntimeVersion: runtimeVersion,
+	Version:        kmsAPIVersion,
+	RuntimeName:    api.Name,
+	RuntimeVersion: api.Version,
 }
 
 func NewKeyManagementService(service encryption.EncryptionService) v1beta1.KeyManagementServiceServer {
@@ -67,8 +64,8 @@ func (k *kms) Encrypt(ctx context.Context, req *v1beta1.EncryptRequest) (*v1beta
 }
 
 func checkVersion(v string) error {
-	if v != version {
-		return fmt.Errorf("unsupported version %q, use %q", v, version)
+	if v != kmsAPIVersion {
+		return fmt.Errorf("unsupported version %q, use %q", v, kmsAPIVersion)
 	}
 	return nil
 }
