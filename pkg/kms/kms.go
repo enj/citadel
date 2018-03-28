@@ -3,8 +3,8 @@ package kms
 import (
 	"fmt"
 
-	"github.com/enj/kms/api/v1beta1"
-	"github.com/enj/kms/pkg/encryption"
+	"github.com/enj/citadel/api/v1beta1"
+	"github.com/enj/citadel/pkg/encryption"
 
 	"golang.org/x/net/context"
 )
