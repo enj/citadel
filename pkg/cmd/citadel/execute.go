@@ -1,10 +1,10 @@
-package kms
+package citadel
 
 import (
-	"github.com/enj/kms/api/v1beta1"
-	"github.com/enj/kms/pkg/encryption/prefix"
-	"github.com/enj/kms/pkg/kek"
-	"github.com/enj/kms/pkg/kms"
+	"github.com/enj/citadel/api/v1beta1"
+	"github.com/enj/citadel/pkg/encryption/prefix"
+	"github.com/enj/citadel/pkg/kek"
+	"github.com/enj/citadel/pkg/kms"
 
 	"google.golang.org/grpc"
 )

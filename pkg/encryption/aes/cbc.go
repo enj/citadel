@@ -8,8 +8,8 @@ import (
 	"errors"
 	"io"
 
-	"github.com/enj/kms/pkg/encryption"
-	"github.com/enj/kms/pkg/kek"
+	"github.com/enj/citadel/pkg/encryption"
+	"github.com/enj/citadel/pkg/kek"
 )
 
 func NewAESCBCService(kek kek.KeyEncryptionKeyService) (encryption.EncryptionService, error) {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/enj/kms/pkg/encryption"
+	"github.com/enj/citadel/pkg/encryption"
 )
 
 const (

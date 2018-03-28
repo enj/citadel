@@ -3,7 +3,7 @@ package encryption
 import (
 	"fmt"
 
-	"github.com/enj/kms/pkg/kek"
+	"github.com/enj/citadel/pkg/kek"
 )
 
 type EncryptionService interface {

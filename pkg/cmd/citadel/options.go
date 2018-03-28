@@ -1,4 +1,4 @@
-package kms
+package citadel
 
 import (
 	"flag"
@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/enj/kms/pkg/encryption"
-	"github.com/enj/kms/pkg/encryption/aes"
+	"github.com/enj/citadel/pkg/encryption"
+	"github.com/enj/citadel/pkg/encryption/aes"
 )
 
 const (
