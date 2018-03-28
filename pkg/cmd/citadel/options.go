@@ -48,7 +48,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&args.endpoint, "endpoint", "", `the listen address (ex. unix:///tmp/kms.sock)`)
+	flag.StringVar(&args.endpoint, "endpoint", "", `the listen address (ex. unix:///tmp/socket)`)
 	flag.StringVar(&args.command, "command", "", "the command to retrieve the key encryption key")
 	flag.StringVar(&args.mode, "mode", encryptionModes[0].Name, fmt.Sprintf("encryption mode to use, the options are %s", encryptionModes))
 	flag.DurationVar(&args.timeout, "timeout", time.Hour, "maximum time to cache KEK locally")

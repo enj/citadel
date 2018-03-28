@@ -5,16 +5,14 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/enj/citadel/pkg/api"
 	"github.com/enj/citadel/pkg/encryption"
 )
 
-const (
-	kmsName = "ck"
-	sep     = ":"
-)
+const sep = ":"
 
 func NewPrefixEncryption(mode encryption.EncryptionMode, delegate encryption.EncryptionService) encryption.EncryptionService {
-	modeStr := strings.Join([]string{kmsName, mode.Name, mode.Version}, sep)
+	modeStr := strings.Join([]string{api.ShortName, mode.Name, mode.Version}, sep)
 	return &prefixEncryption{
 		prefix:   []byte(sep + modeStr + sep),
 		delegate: delegate,
