@@ -40,3 +40,30 @@ socket activation is assumed.
 The KEK is currently used to do AES-CBC encryption. This does not provide
 ciphertext authentication. Other methods are being considered with the intent
 of providing cryptographic agility and features such as authentication.
+
+## Examples
+
+Here is an example which uses a [Clevis][clevis] decryption policy to allow
+access to the KEK only when a [Tang][tang] server is accessible on the
+network.
+
+First, you need to generate the KEK and encrypt it using the Clevis policy:
+
+```
+$ dd if=/dev/urandom bs=32 count=1 status=none \
+  | clevis encrypt tang '{"url":"http://tang.srv"}' \
+  > /var/db/citadel/kek.jwe
+```
+
+Next, you run c5l with the `clevis decrypt` command:
+
+```
+$ citadel --command 'clevis decrypt < /var/db/citadel/kek.jwe'
+```
+
+When run, c5l will be able to acquire the KEK if, and only if, the Tang server
+is accessible on the network. Attempts to read the file (`/var/db/citadel/kek.jwe`)
+directly will reveal only ciphertext.
+
+[clevis]: https://github.com/latchset/clevis
+[tang]: https://github.com/latchset/tang
